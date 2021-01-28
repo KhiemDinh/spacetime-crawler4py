@@ -1,20 +1,40 @@
 import re
+import requests
 from urllib.parse import urlparse
+from bs4 import BeautifulSoup
 
 def scraper(url, resp):
     links = extract_next_links(url, resp)
-    return [link for link in links if is_valid(link)]
+    return links
 
 def extract_next_links(url, resp):
     # Implementation requred.
-    return list()
+    output = []
+    soup = BeautifulSoup(requests.get(url).content, 'html.parser')
+    for link in soup.find_all('a'):
+        href = link.attrs.get('href')
+        if is_valid(href):
+            output.append(href)
+    return output
 
-# this is a test
+
 def is_valid(url):
     try:
         parsed = urlparse(url)
+
         if parsed.scheme not in set(["http", "https"]):
             return False
+
+	# check domain
+        if url.find("ics.uci.edu") == -1:
+            return False
+	
+	# check status/robots.txt
+        
+	# check trap
+
+	# check similarity
+
         return not re.match(
             r".*\.(css|js|bmp|gif|jpe?g|ico"
             + r"|png|tiff?|mid|mp2|mp3|mp4"
