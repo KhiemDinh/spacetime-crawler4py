@@ -4,6 +4,10 @@ import urllib.robotparser
 from urllib.parse import urlparse
 from bs4 import BeautifulSoup
 
+# testing purposes
+url_count = 0
+url_set = set()
+
 def scraper(url, resp):
     links = extract_next_links(url, resp)
     return [link for link in links if is_valid(link)]
@@ -12,7 +16,15 @@ def scraper(url, resp):
 def extract_next_links(url, resp):
     # Implementation required.
     output = set()
-    soup = BeautifulSoup(requests.get(url), 'html.parser')
+    soup = BeautifulSoup(requests.get(url).text, 'html.parser')
+    
+    # check if soup is high quality
+    # find all unique words in the soup that are of length 3+
+    soup_text = set([_ for _ in re.sub('[^A-Za-z0-9]+', ' ', soup.get_text().lower()).split() if len(_) > 2])
+    # define high quality soup to be 200+  unique words
+    if len(soup_text) <= 200:
+        return []
+
     for link in soup.find_all('a', href=True):
         output.add(link.attrs.get('href'))
     return list(output)
@@ -38,8 +50,14 @@ def crawlable(url, parsed):
         return False
 
 
-def is_trap(url, parsed):
-    return False
+def is_trap(parsed):
+    # long urls
+    if len(parsed.geturl()) >= 200:
+        return True
+
+    # calendars
+    if re.match(r".*(/calendar).?$", parsed.path.lower()):
+        return True
 
 
 def is_valid(url):
@@ -49,9 +67,10 @@ def is_valid(url):
         if parsed.scheme not in set(["http", "https"]):
             return False
 
+        global url_count, url_set
+
         # check domain
-        if url.find('informatics.uci.edu/') == -1 and \
-                 url.find("today.uci.edu/department/information_computer_sciences/") == -1:
+        if url.find("informatics.uci.edu/") == -1:
             return False
 
         # check robots.txt
@@ -59,20 +78,31 @@ def is_valid(url):
             return False
 
         # check trap
-        if is_trap(url, parsed):
+        if is_trap(parsed):
             return False
 
-        # check quality
+        # check duplicates
+        if url in url_set:
+            return False
 
-        return not re.match(
+
+        if re.match(
             r".*\.(css|js|bmp|gif|jpe?g|ico"
             + r"|png|tiff?|mid|mp2|mp3|mp4"
             + r"|wav|avi|mov|mpeg|ram|m4v|mkv|ogg|ogv|pdf"
             + r"|ps|eps|tex|ppt|pptx|doc|docx|xls|xlsx|names"
             + r"|data|dat|exe|bz2|tar|msi|bin|7z|psd|dmg|iso"
             + r"|epub|dll|cnf|tgz|sha1"
-            + r"|thmx|mso|arff|rtf|jar|csv"
-            + r"|rm|smil|wmv|swf|wma|zip|rar|gz)$", parsed.path.lower())
+            + r"|thmx|mso|arff|rtf|jar|csv|thesis"
+            + r"|z|aspx|mpg|mat|pps|bam|ppsx"
+            + r"|rm|smil|wmv|swf|wma|zip|rar|gz|war|apk)$", parsed.path.lower()):
+            return False
+        
+        url_set.add(url)
+        url_count += 1
+        print("CURRENT URL_COUNT: {}".format(url_count))
+        
+        return True
 
     except TypeError:
         print ("TypeError for ", parsed)
