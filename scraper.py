@@ -8,6 +8,7 @@ def scraper(url, resp):
     links = extract_next_links(url, resp)
     return links
 
+
 def extract_next_links(url, resp):
     # Implementation required.
     output = []
@@ -17,6 +18,26 @@ def extract_next_links(url, resp):
         if is_valid(href):
             output.append(href)
     return output
+
+
+def crawlable(url, parsed):
+    # check robots.txt
+    try:
+        netloc = "https://" + parsed.netloc + "/robots.txt"
+        site = requests.get(netloc)
+        
+        if site.status_code != 200:
+            return False
+        
+        permission = urllib.robotparser.RobotFileParser()
+        permission.set_url(netloc)
+        permission.read()
+
+        return permission.can_fetch("*", url)
+
+    # no robots.txt
+    except:
+        return False
 
 
 def is_valid(url):
@@ -52,21 +73,3 @@ def is_valid(url):
         print ("TypeError for ", parsed)
         raise
 
-def crawlable(url, parsed):
-    # check robots.txt
-    try:
-        netloc = "https://" + parsed.netloc + "/robots.txt"
-        site = requests.get(netloc)
-        
-        if site.status_code == 200:
-            return False
-        
-        permission = urllib.robotparser.RobotFileParser()
-        permission.set_url(netloc)
-        permission.read()
-
-        return permission.can_fetch("*", url)
-
-    # no robots.txt
-    except:
-        return False
