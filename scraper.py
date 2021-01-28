@@ -1,5 +1,6 @@
 import re
 import requests
+import urllib
 from urllib.parse import urlparse
 from bs4 import BeautifulSoup
 
@@ -8,7 +9,7 @@ def scraper(url, resp):
     return links
 
 def extract_next_links(url, resp):
-    # Implementation requred.
+    # Implementation required.
     output = []
     soup = BeautifulSoup(requests.get(url).content, 'html.parser')
     for link in soup.find_all('a'):
@@ -25,15 +26,17 @@ def is_valid(url):
         if parsed.scheme not in set(["http", "https"]):
             return False
 
-	# check domain
+        # check domain
         if url.find("ics.uci.edu") == -1:
             return False
-	
-	# check status/robots.txt
-        
-	# check trap
 
-	# check similarity
+        # check robots.txt
+        if not crawlable(url, parsed):
+            return False
+
+        # check trap
+
+        # check similarity
 
         return not re.match(
             r".*\.(css|js|bmp|gif|jpe?g|ico"
@@ -48,3 +51,22 @@ def is_valid(url):
     except TypeError:
         print ("TypeError for ", parsed)
         raise
+
+def crawlable(url, parsed):
+    # check robots.txt
+    try:
+        netloc = "https://" + parsed.netloc + "/robots.txt"
+        site = requests.get(netloc)
+        
+        if site.status_code == 200:
+            return False
+        
+        permission = urllib.robotparser.RobotFileParser()
+        permission.set_url(netloc)
+        permission.read()
+
+        return permission.can_fetch("*", url)
+
+    # no robots.txt
+    except:
+        return False
