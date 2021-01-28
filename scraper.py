@@ -12,8 +12,8 @@ def scraper(url, resp):
 def extract_next_links(url, resp):
     # Implementation required.
     output = set()
-    soup = BeautifulSoup(requests.get(url).content, 'html.parser')
-    for link in soup.find_all('a'):
+    soup = BeautifulSoup(requests.get(url), 'html.parser')
+    for link in soup.find_all('a', href=True):
         output.add(link.attrs.get('href'))
     return list(output)
 
@@ -38,6 +38,10 @@ def crawlable(url, parsed):
         return False
 
 
+def is_trap(url, parsed):
+    return False
+
+
 def is_valid(url):
     try:
         parsed = urlparse(url)
@@ -55,6 +59,8 @@ def is_valid(url):
             return False
 
         # check trap
+        if is_trap(url, parsed):
+            return False
 
         # check quality
 
