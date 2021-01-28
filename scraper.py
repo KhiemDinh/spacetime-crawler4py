@@ -1,23 +1,21 @@
 import re
 import requests
-import urllib
+import urllib.robotparser
 from urllib.parse import urlparse
 from bs4 import BeautifulSoup
 
 def scraper(url, resp):
     links = extract_next_links(url, resp)
-    return links
+    return [link for link in links if is_valid(link)]
 
 
 def extract_next_links(url, resp):
     # Implementation required.
-    output = []
+    output = set()
     soup = BeautifulSoup(requests.get(url).content, 'html.parser')
     for link in soup.find_all('a'):
-        href = link.attrs.get('href')
-        if is_valid(href):
-            output.append(href)
-    return output
+        output.add(link.attrs.get('href'))
+    return list(output)
 
 
 def crawlable(url, parsed):
@@ -34,7 +32,7 @@ def crawlable(url, parsed):
         permission.read()
 
         return permission.can_fetch("*", url)
-
+    
     # no robots.txt
     except:
         return False
@@ -48,7 +46,8 @@ def is_valid(url):
             return False
 
         # check domain
-        if url.find("ics.uci.edu") == -1:
+        if url.find('informatics.uci.edu/') == -1 and \
+                 url.find("today.uci.edu/department/information_computer_sciences/") == -1:
             return False
 
         # check robots.txt
@@ -57,7 +56,7 @@ def is_valid(url):
 
         # check trap
 
-        # check similarity
+        # check quality
 
         return not re.match(
             r".*\.(css|js|bmp|gif|jpe?g|ico"
