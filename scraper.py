@@ -8,6 +8,18 @@ from bs4 import BeautifulSoup
 url_count = 0
 url_set = set()
 
+# Saving the list of text words in a separate file just in case
+# the program crashes and the list of words get gone
+# opening and closing textlist.txt if it already exists
+# this will overwrite and erase the previous content
+tmp = open('textlist.txt', 'w')
+tmp.close()
+
+# And we'll have a global dictionary as well
+# But we have a backup as a file as well
+frequency = {}
+
+
 def scraper(url, resp):
     links = extract_next_links(url, resp)
     return [link for link in links if is_valid(link)]
@@ -27,6 +39,24 @@ def extract_next_links(url, resp):
 
     for link in soup.find_all('a', href=True):
         output.add(link.attrs.get('href'))
+        
+    # debugging
+    
+    # print(soup_text)
+    
+    ### Creating a collection of text files
+    
+    with open('textlist.txt', 'a') as f: # keeps appending
+        f.writelines("%s\n" % word for word in soup_text)
+        
+    ### as well as our global dictionoary for later convinence
+    
+    for word in soup_text:
+        if word not in frequency: frequency[word] = 1
+        else: frequency[word] += 1
+    
+    print(frequency)
+    
     return list(output)
 
 
@@ -58,6 +88,9 @@ def is_trap(parsed):
     # calendars
     if re.match(r".*(/calendar).?$", parsed.path.lower()):
         return True
+    
+    # very large files ??
+    # can't do much with the parsed urls only; need the actual content
 
 
 def is_valid(url):
@@ -70,6 +103,12 @@ def is_valid(url):
         global url_count, url_set
 
         # check domain
+        
+        # not forget to add other urls
+        # "ics.uci.edu/"
+        # "cs.uci.edu/"
+        # "stat.uci.edu/"
+        # "today.uci.edu/department/information_computer_sciences/"
         if url.find("informatics.uci.edu/") == -1:
             return False
 
