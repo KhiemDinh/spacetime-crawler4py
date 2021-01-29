@@ -8,15 +8,15 @@ from bs4 import BeautifulSoup
 url_count = 0
 url_set = set()
 
-# Saving the list of text words in a separate file just in case
-# the program crashes and the list of words get gone
-# opening and closing textlist.txt if it already exists
-# this will overwrite and erase the previous content
+### Saving the list of text words in a separate file just in case
+### the program crashes and the list of words get gone
+### opening and closing textlist.txt if it already exists
+### this will overwrite and erase the previous content
 tmp = open('textlist.txt', 'w')
 tmp.close()
 
-# And we'll have a global dictionary as well
-# But we have a backup as a file as well
+### And we'll have a global dictionary as well
+### But we have a backup as a file as well
 frequency = {}
 
 
@@ -41,7 +41,6 @@ def extract_next_links(url, resp):
         output.add(link.attrs.get('href'))
         
     # debugging
-    
     # print(soup_text)
     
     ### Creating a collection of text files
@@ -55,7 +54,8 @@ def extract_next_links(url, resp):
         if word not in frequency: frequency[word] = 1
         else: frequency[word] += 1
     
-    print(frequency)
+    # debugging
+    # print(frequency)
     
     return list(output)
 
