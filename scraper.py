@@ -109,7 +109,9 @@ def is_valid(url):
         # "cs.uci.edu/"
         # "stat.uci.edu/"
         # "today.uci.edu/department/information_computer_sciences/"
-        if url.find("informatics.uci.edu/") == -1:
+        if url.find("ics.uci.edu/") and url.find("cs.uci.edu/") \
+            and url.find("informatics.uci.edu/") == -1 and url.find("stat.uci.edu/") == -1 \
+            and url.find("today.uci.edu/department/information_computer_sciences/") == -1:
             return False
 
         # check robots.txt
