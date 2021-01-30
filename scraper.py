@@ -30,14 +30,14 @@ def extract_next_links(url, resp):
     output = set()
     soup = BeautifulSoup(requests.get(url).text, 'html.parser')
 
-    if resp.status == 200 and len(soup.get_text()) != 0:
-
+    if resp.status == 200 and len(soup.get_text()) == 0:
+        return []
     ########## SimHash Implementation HERE ##########
 
     #################################################
 
-        for link in soup.find_all('a', href=True):
-            output.add(urldefrag(link.attrs.get('href'))[0])
+    for link in soup.find_all('a', href=True):
+        output.add(urldefrag(link.attrs.get('href'))[0])
         
     # debugging
     # print(soup_text)
