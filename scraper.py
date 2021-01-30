@@ -147,8 +147,6 @@ def record_information(url):
     for word in soup_text:
         frequency[word] += 1
 
-    frequency = sorted(frequency.items(), key=lambda item: (-item[1], item[0]))
-
     with open('textlist.txt', 'w') as f:
-        for k, v in frequency:
+        for k, v in sorted(frequency.items(), key=lambda item: (-item[1], item[0])):
             f.writelines("{} -> {}\n".format(k, v))
