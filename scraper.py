@@ -29,29 +29,28 @@ def extract_next_links(url, resp):
     # Implementation required.
     output = set()
 
-    if 200 <= resp.status <= 606 and resp.status != 204:
-        soup = BeautifulSoup(requests.get(url).text, 'html.parser')
+    soup = BeautifulSoup(requests.get(url).text, 'html.parser')
+    
+    # check if soup is high quality
+    # find all unique words in the soup that are of length 3+
+    soup_text = [_ for _ in re.sub('[^A-Za-z0-9]+', ' ', soup.get_text().lower()).split() if len(_) > 2]
+    
+    # define high quality soup to be 200+ unique words
+    # account for if the response status is 200 but has no text
+    if len(set(soup_text)) <= 200:
+        return []
+
+    ########## SimHash Implementation HERE ##########
+
+    #################################################
+
+    for link in soup.find_all('a', href=True):
+        link = link.attrs.get('href')
+        if link: output.add(urldefrag(link)[0])
         
-        # check if soup is high quality
-        # find all unique words in the soup that are of length 3+
-        soup_text = [_ for _ in re.sub('[^A-Za-z0-9]+', ' ', soup.get_text().lower()).split() if len(_) > 2]
-        
-        # define high quality soup to be 200+ unique words
-        # account for if the response status is 200 but has no text
-        if len(set(soup_text)) <= 200:
-            return []
-
-        ########## SimHash Implementation HERE ##########
-
-        #################################################
-
-        for link in soup.find_all('a', href=True):
-            link = link.attrs.get('href')
-            if link: output.add(urldefrag(link)[0])
-            
-        # debugging
-        # print(soup_text)
-        # print(frequency)
+    # debugging
+    # print(soup_text)
+    # print(frequency)
         
     return list(output)
 
@@ -62,11 +61,14 @@ def crawlable(url, parsed):
         netloc = parsed.scheme + "://" + parsed.netloc + "/robots.txt"
         site = requests.get(netloc)
 
-        permission = urllib.robotparser.RobotFileParser()
-        permission.set_url(netloc)
-        permission.read()
+        if 200 <= site.status <= 599 and site.status != 204:
+            permission = urllib.robotparser.RobotFileParser()
+            permission.set_url(netloc)
+            permission.read()
 
-        return permission.can_fetch("*", url)
+            return permission.can_fetch("*", url)
+
+        return False
     
     # no robots.txt
     except:
