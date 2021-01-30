@@ -125,6 +125,9 @@ def is_valid(url):
         if is_trap(parsed):
             return False
 
+        if url in url_set:
+            return False
+
         if re.match(
             r".*\.(css|js|bmp|gif|jpe?g|ico"
             + r"|png|tiff?|mid|mp2|mp3|mp4"
