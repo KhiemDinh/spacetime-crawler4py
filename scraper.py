@@ -9,7 +9,7 @@ from bs4 import BeautifulSoup
 url_set = set()
 
 traps = ["/calendar","replytocom=","wp-json","share=","format=xml", "/feed", ".pdf", ".zip", ".sql", "action=login", "?ical=", ".ppt", "version=", "=diff", "difftype=sidebyside"]
-disallowed = ["wics.ics.uci.edu/events", "evoke.ics.uci.edu"]
+disallowed = ["wics.ics.uci.edu/events"]
 
 ### Saving the list of text words in a separate file just in case
 ### the program crashes and the list of words get gone
@@ -30,8 +30,11 @@ def scraper(url, resp):
 def extract_next_links(url, resp):
     # Implementation required.
     try:
-        output = set()
+        url = urldefrag(url)[0]
+        if url in url_set:
+            return []
 
+        output = set()
         soup = BeautifulSoup(requests.get(url).text, 'html.parser')
 
         # check if soup is high quality
@@ -50,12 +53,7 @@ def extract_next_links(url, resp):
 
         for link in soup.find_all('a', href=True):
             link = link.attrs.get('href')
-
-            if link:
-                link = urldefrag(link)[0]
-
-                if link not in url_set:
-                    output.add(link)
+            if link: output.add(urldefrag(link)[0])
             
         # debugging
         # print(soup_text)
@@ -117,9 +115,9 @@ def is_valid(url):
             return False
 
         # check domain
-        if url.find("ics.uci.edu/") == -1 and url.find("cs.uci.edu/") == -1 \
-            and url.find("informatics.uci.edu/") == -1 and url.find("stat.uci.edu/") == -1 \
-            and url.find("today.uci.edu/department/information_computer_sciences/") == -1:
+        if url.find(".ics.uci.edu/") == -1 and url.find(".cs.uci.edu/") == -1 \
+            and url.find(".informatics.uci.edu/") == -1 and url.find(".stat.uci.edu/") == -1 \
+            and url.find(".today.uci.edu/department/information_computer_sciences/") == -1:
             return False
 
         # check robots.txt
