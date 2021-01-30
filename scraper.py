@@ -138,14 +138,14 @@ def is_valid(url):
 def record_information(url):
     global url_set, frequency    
 
-    soup = BeautifulSoup(requests.get(url).text, 'html.parser')
-    soup_text = [_ for _ in re.sub('[^A-Za-z0-9]+', ' ', soup.get_text().lower()).split() if len(_) > 2]
+    # soup = BeautifulSoup(requests.get(url).text, 'html.parser')
+    # soup_text = [_ for _ in re.sub('[^A-Za-z0-9]+', ' ', soup.get_text().lower()).split() if len(_) > 2]
     
     url_set.add(url)
     print("CURRENT URL_COUNT: {}".format(len(url_set)))
 
-    for word in soup_text:
-        frequency[word] += 1
+    # for word in soup_text:
+    #     frequency[word] += 1
 
     # with open('textlist.txt', 'w') as f:
     #     for k, v in sorted(frequency.items(), key=lambda item: (-item[1], item[0])):
