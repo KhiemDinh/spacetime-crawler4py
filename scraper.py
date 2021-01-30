@@ -8,6 +8,7 @@ from bs4 import BeautifulSoup
 # testing purposes + solutions to question 1
 url_set = set()
 
+traps = ["/calendar","replytocom=","wp-json","share=","format=xml", "/feed", ".pdf", ".zip", ".sql", "action=login", "?ical=", ".ppt", "version=", "=diff", "difftype=sidebyside"]
 disallowed = ["wics.ics.uci.edu/events", "evoke.ics.uci.edu"]
 
 ### Saving the list of text words in a separate file just in case
@@ -87,9 +88,10 @@ def is_trap(parsed):
     if len(parsed_url) >= 200:
         return True
 
-    # calendars
-    if "/calendar" in parsed_url:
-        return True
+    # trap parts
+    for trap in traps:
+        if trap in parsed_url:
+            return True
 
     # disallowed websites
     for link in disallowed:
