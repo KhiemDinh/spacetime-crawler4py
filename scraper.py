@@ -30,7 +30,7 @@ def extract_next_links(url, resp):
     output = set()
     soup = BeautifulSoup(requests.get(url).text, 'html.parser')
 
-    if resp.status == 200 and soup.get_text():
+    if resp.status == 200 and len(soup.get_text()) != 0:
 
     ########## SimHash Implementation HERE ##########
 
