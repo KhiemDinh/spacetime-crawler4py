@@ -18,7 +18,7 @@ tmp.close()
 
 ### And we'll have a global dictionary as well
 ### But we have a backup as a file as well
-frequency = {}
+frequency = defaultdict(int)
 
 
 def scraper(url, resp):
@@ -49,20 +49,6 @@ def extract_next_links(url, resp):
         
     # debugging
     # print(soup_text)
-    
-    ### Creating a collection of text files
-    
-    with open('textlist.txt', 'a') as f: # keeps appending
-        f.writelines("%s\n" % word for word in soup_text)
-        
-    ### as well as our global dictionoary for later convinence
-    global frequency    
-
-    for word in soup_text:
-        if word not in frequency: frequency[word] = 1
-        else: frequency[word] += 1
-    
-    # debugging
     # print(frequency)
     
     return list(output)
@@ -109,8 +95,6 @@ def is_valid(url):
         if parsed.scheme not in set(["http", "https"]):
             return False
 
-        global url_count, url_set
-
         # check domain
         if url.find("ics.uci.edu/") == -1 and url.find("cs.uci.edu/") == -1 \
             and url.find("informatics.uci.edu/") == -1 and url.find("stat.uci.edu/") == -1 \
@@ -141,9 +125,7 @@ def is_valid(url):
             + r"|rm|smil|wmv|swf|wma|zip|rar|gz|war|apk)$", parsed.path.lower()):
             return False
         
-        url_set.add(url)
-        url_count += 1
-        print("CURRENT URL_COUNT: {}".format(url_count))
+        record_information(url)
         
         return True
 
@@ -151,3 +133,19 @@ def is_valid(url):
         print ("TypeError for ", parsed)
         raise
 
+def record_information(url):
+    global url_count, url_set, frequency    
+
+    url_set.add(url)
+    url_count += 1
+    print("CURRENT URL_COUNT: {}".format(url_count))
+
+    soup = BeautifulSoup(requests.get(url).text, 'html.parser')
+    soup_text = [_ for _ in re.sub('[^A-Za-z0-9]+', ' ', soup.get_text().lower()).split() if len(_) > 2]
+
+    for word in soup_text:
+        frequency[word] += 1
+
+    with open('textlist.txt', 'w') as f:
+        for k, v in sorted(frequency.items(), key=lambda item: (-item[1], item[0])):
+            f.writelines("{} -> {}".format(k, v))
