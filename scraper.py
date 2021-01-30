@@ -50,7 +50,12 @@ def extract_next_links(url, resp):
 
         for link in soup.find_all('a', href=True):
             link = link.attrs.get('href')
-            if link: output.add(urldefrag(link)[0])
+
+            if link:
+                link = urldefrag(link)[0]
+
+                if link not in url_set:
+                    output.add(link)
             
         # debugging
         # print(soup_text)
@@ -123,9 +128,6 @@ def is_valid(url):
 
         # check trap
         if is_trap(parsed):
-            return False
-
-        if url in url_set:
             return False
 
         if re.match(
