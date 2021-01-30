@@ -29,7 +29,7 @@ def extract_next_links(url, resp):
     # Implementation required.
     output = set()
 
-    if 200 <= resp.status <= 599 and resp.status != 204:
+    if 200 <= resp.status <= 606 and resp.status != 204:
         soup = BeautifulSoup(requests.get(url).text, 'html.parser')
         
         # check if soup is high quality
