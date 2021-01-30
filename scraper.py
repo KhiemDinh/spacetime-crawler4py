@@ -4,6 +4,7 @@ import urllib.robotparser
 from collections import defaultdict
 from urllib.parse import urlparse, urldefrag
 from bs4 import BeautifulSoup
+from simhash import Simhash, SimhashIndex
 
 # testing purposes + solutions to question 1
 url_set = set()
@@ -22,6 +23,7 @@ tmp.close()
 ### But we have a backup as a file as well
 frequency = defaultdict(int)
 
+simhash_index = SimhashIndex([])
 
 def scraper(url, resp):
     links = extract_next_links(url, resp)
@@ -37,15 +39,19 @@ def extract_next_links(url, resp):
 
         # check if soup is high quality
         # find all unique words in the soup that are of length 3+
-        soup_text = [_ for _ in re.sub('[^A-Za-z0-9]+', ' ', soup.get_text().lower()).split() if len(_) > 2]
+        soup_text = re.sub('[^A-Za-z0-9]+', ' ', soup.get_text().lower())
+        soup_list = [_ for _ in soup_text.split() if len(_) > 2]
 
         # define high quality soup to be 200+ unique words
         # account for if the response status is 200 but has no text
-        if len(set(soup_text)) <= 200:
+        if len(set(soup_list)) <= 200:
             return []
 
         ########## SimHash Implementation HERE ##########
+        url_sim = Simhash(soup_text)
 
+        if simhash_index.get_near_dups(url_sim):
+            return []        
         #################################################
 
         for link in soup.find_all('a', href=True):
@@ -55,6 +61,8 @@ def extract_next_links(url, resp):
         # debugging
         # print(soup_text)
         # print(frequency)
+
+        simhash_index.add(url, url_sim)
             
         return list(output)
     
@@ -123,10 +131,6 @@ def is_valid(url):
 
         # check trap
         if is_trap(parsed):
-            return False
-
-        # check duplicates
-        if url in url_set:
             return False
 
         if re.match(
