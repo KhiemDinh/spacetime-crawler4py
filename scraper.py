@@ -9,7 +9,7 @@ from bs4 import BeautifulSoup
 url_set = set()
 
 traps = ["/calendar","replytocom=","wp-json","share=","format=xml", "/feed", ".pdf", ".zip", ".sql", "action=login", "?ical=", ".ppt", "version=", "=diff", "difftype=sidebyside"]
-disallowed = ["wics.ics.uci.edu/events"]
+disallowed = ["wics.ics.uci.edu/events", "evoke.ics.uci.edu/qs-personal-data-landscapes-poster"]
 
 ### And we'll have a global dictionary as well
 ### But we have a backup as a file as well
