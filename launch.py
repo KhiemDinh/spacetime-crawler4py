@@ -13,6 +13,7 @@ def main(config_file, restart):
     ### this will overwrite and erase the previous content
     tmp = open('textlist.txt', 'w')
     tmp.close()
+    
     cparser = ConfigParser()
     cparser.read(config_file)
     config = Config(cparser)
