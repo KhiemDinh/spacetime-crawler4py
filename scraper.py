@@ -8,6 +8,8 @@ from bs4 import BeautifulSoup
 # testing purposes + solutions to question 1
 url_set = set()
 
+disallowed = ["wics.ics.uci.edu/events", "evoke.ics.uci.edu"]
+
 ### Saving the list of text words in a separate file just in case
 ### the program crashes and the list of words get gone
 ### opening and closing textlist.txt if it already exists
@@ -86,12 +88,13 @@ def is_trap(parsed):
         return True
 
     # calendars
-    if re.match(r".*(calendar).?$", parsed_url):
+    if "/calendar" in parsed_url:
         return True
 
     # disallowed websites
-    if re.match(r".*(wics.ics.uci.edu/events|evoke.ics.uci.edu).?$", parsed_url):
-        return True
+    for link in disallowed:
+        if link in parsed_url:
+            return True
     
     # very large files ??
     # can't do much with the parsed urls only; need the actual content
