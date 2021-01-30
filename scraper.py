@@ -29,22 +29,15 @@ def extract_next_links(url, resp):
     # Implementation required.
     output = set()
     soup = BeautifulSoup(requests.get(url).text, 'html.parser')
-    
-    # check if soup is high quality
-    # find all unique words in the soup that are of length 3+
-    soup_text = [_ for _ in re.sub('[^A-Za-z0-9]+', ' ', soup.get_text().lower()).split() if len(_) > 2]
-    
-    # define high quality soup to be 200+ unique words
-    # account for if the response status is 200 but has no text
-    if len(set(soup_text)) <= 200 or (resp.status == 200 and set(soup_text) == set()):
-        return []
+
+    if resp.status == 200 and soup.get_text():
 
     ########## SimHash Implementation HERE ##########
 
     #################################################
 
-    for link in soup.find_all('a', href=True):
-        output.add(urldefrag(link.attrs.get('href'))[0])
+        for link in soup.find_all('a', href=True):
+            output.add(urldefrag(link.attrs.get('href'))[0])
         
     # debugging
     # print(soup_text)
@@ -56,7 +49,7 @@ def extract_next_links(url, resp):
 def crawlable(url, parsed):
     # check robots.txt
     try:
-        netloc = "https://" + parsed.netloc + "/robots.txt"
+        netloc = parsed.scheme + "://" + parsed.netloc + "/robots.txt"
         site = requests.get(netloc)
         
         permission = urllib.robotparser.RobotFileParser()
@@ -88,6 +81,22 @@ def is_trap(parsed):
     # can't do much with the parsed urls only; need the actual content
 
 
+def check_quality(url):
+    is_quality = True
+    soup = BeautifulSoup(requests.get(url).text, 'html.parser')
+    
+    # check if soup is high quality
+    # find all unique words in the soup that are of length 3+
+    soup_text = [_ for _ in re.sub('[^A-Za-z0-9]+', ' ', soup.get_text().lower()).split() if len(_) > 2]
+    
+    # define high quality soup to be 200+ unique words
+    # account for if the response status is 200 but has no text
+    if len(set(soup_text)) <= 200:
+        is_quality = False
+
+    return (is_quality, soup_text)
+
+
 def is_valid(url):
     try:
         parsed = urlparse(url)
@@ -113,6 +122,11 @@ def is_valid(url):
         if url in url_set:
             return False
 
+        is_quality, soup_text = check_quality(url)
+
+        if is_quality:
+            return False
+
         if re.match(
             r".*\.(css|js|bmp|gif|jpe?g|ico"
             + r"|png|tiff?|mid|mp2|mp3|mp4"
@@ -125,7 +139,7 @@ def is_valid(url):
             + r"|rm|smil|wmv|swf|wma|zip|rar|gz|war|apk)$", parsed.path.lower()):
             return False
         
-        record_information(url)
+        record_information(url, soup_text)
         
         return True
 
@@ -136,18 +150,15 @@ def is_valid(url):
 # record information here because we know that the url is a valid url to be downloaded from.
 # unfortunately takes a lot of time so a better implementation on how to record the information
 # would be very much appreciated
-def record_information(url):
+def record_information(url, soup_text):
     global url_set, frequency    
 
     url_set.add(url)
     print("CURRENT URL_COUNT: {}".format(len(url_set)))
 
-    soup = BeautifulSoup(requests.get(url).text, 'html.parser')
-    soup_text = [_ for _ in re.sub('[^A-Za-z0-9]+', ' ', soup.get_text().lower()).split() if len(_) > 2]
-
     for word in soup_text:
         frequency[word] += 1
 
-    with open('textlist.txt', 'w') as f:
-        for k, v in sorted(frequency.items(), key=lambda item: (-item[1], item[0])):
-            f.writelines("{} -> {}\n".format(k, v))
+    # with open('textlist.txt', 'w') as f:
+    #     for k, v in sorted(frequency.items(), key=lambda item: (-item[1], item[0])):
+    #         f.writelines("{} -> {}\n".format(k, v))
