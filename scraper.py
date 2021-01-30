@@ -4,7 +4,6 @@ import urllib.robotparser
 from collections import defaultdict
 from urllib.parse import urlparse, urldefrag
 from bs4 import BeautifulSoup
-from simhash import Simhash, SimhashIndex
 
 # testing purposes + solutions to question 1
 url_set = set()
@@ -22,8 +21,6 @@ tmp.close()
 ### And we'll have a global dictionary as well
 ### But we have a backup as a file as well
 frequency = defaultdict(int)
-
-simhash_index = SimhashIndex([])
 
 def scraper(url, resp):
     links = extract_next_links(url, resp)
@@ -48,10 +45,7 @@ def extract_next_links(url, resp):
             return []
 
         ########## SimHash Implementation HERE ##########
-        url_sim = Simhash(soup_text)
-
-        if simhash_index.get_near_dups(url_sim):
-            return []        
+    
         #################################################
 
         for link in soup.find_all('a', href=True):
@@ -61,8 +55,6 @@ def extract_next_links(url, resp):
         # debugging
         # print(soup_text)
         # print(frequency)
-
-        simhash_index.add(url, url_sim)
             
         return list(output)
     
