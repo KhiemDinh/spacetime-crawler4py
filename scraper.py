@@ -84,10 +84,11 @@ def is_trap(parsed):
 def check_quality(url):
     is_quality = True
     soup = BeautifulSoup(requests.get(url).text, 'html.parser')
+    soup_text = re.sub('[^A-Za-z0-9]+', ' ', soup.get_text().lower()).split()
     
     # check if soup is high quality
     # find all unique words in the soup that are of length 3+
-    soup_text = [_ for _ in re.sub('[^A-Za-z0-9]+', ' ', soup.get_text().lower()).split() if len(_) > 2]
+    soup_text = [_ for _ in soup_text if len(_) > 2]
     
     # define high quality soup to be 200+ unique words
     # account for if the response status is 200 but has no text
@@ -124,7 +125,7 @@ def is_valid(url):
 
         is_quality, soup_text = check_quality(url)
 
-        if is_quality:
+        if not is_quality:
             return False
 
         if re.match(
