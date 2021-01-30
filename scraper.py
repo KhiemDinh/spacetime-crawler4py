@@ -11,13 +11,6 @@ url_set = set()
 traps = ["/calendar","replytocom=","wp-json","share=","format=xml", "/feed", ".pdf", ".zip", ".sql", "action=login", "?ical=", ".ppt", "version=", "=diff", "difftype=sidebyside"]
 disallowed = ["wics.ics.uci.edu/events"]
 
-### Saving the list of text words in a separate file just in case
-### the program crashes and the list of words get gone
-### opening and closing textlist.txt if it already exists
-### this will overwrite and erase the previous content
-tmp = open('textlist.txt', 'w')
-tmp.close()
-
 ### And we'll have a global dictionary as well
 ### But we have a backup as a file as well
 frequency = defaultdict(int)
