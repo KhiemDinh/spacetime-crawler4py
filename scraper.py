@@ -97,6 +97,8 @@ def is_trap(parsed):
     for link in disallowed:
         if link in parsed_url:
             return True
+
+    return False
     
     # very large files ??
     # can't do much with the parsed urls only; need the actual content
