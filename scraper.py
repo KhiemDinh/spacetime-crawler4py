@@ -5,8 +5,7 @@ from collections import defaultdict
 from urllib.parse import urlparse, urldefrag
 from bs4 import BeautifulSoup
 
-# testing purposes
-url_count = 0
+# testing purposes + solutions to question 1
 url_set = set()
 
 ### Saving the list of text words in a separate file just in case
@@ -72,17 +71,17 @@ def crawlable(url, parsed):
 
 
 def is_trap(parsed):
-    print(parsed.geturl())
+    parsed_url = parsed.geturl()
     # long urls
-    if len(parsed.geturl()) >= 200:
+    if len(parsed_url) >= 200:
         return True
 
     # calendars
-    if re.match(r".*(calendar).?$", parsed.geturl()):
+    if re.match(r".*(calendar).?$", parsed_url):
         return True
 
     # disallowed websites
-    if re.match(r".*(wics.ics.uci.edu/events|evoke.ics.uci.edu).?$", parsed.geturl()):
+    if re.match(r".*(wics.ics.uci.edu/events|evoke.ics.uci.edu).?$", parsed_url):
         return True
     
     # very large files ??
@@ -134,12 +133,14 @@ def is_valid(url):
         print ("TypeError for ", parsed)
         raise
 
+# record information here because we know that the url is a valid url to be downloaded from.
+# unfortunately takes a lot of time so a better implementation on how to record the information
+# would be very much appreciated
 def record_information(url):
-    global url_count, url_set, frequency    
+    global url_set, frequency    
 
     url_set.add(url)
-    url_count += 1
-    print("CURRENT URL_COUNT: {}".format(url_count))
+    print("CURRENT URL_COUNT: {}".format(len(url_set))
 
     soup = BeautifulSoup(requests.get(url).text, 'html.parser')
     soup_text = [_ for _ in re.sub('[^A-Za-z0-9]+', ' ', soup.get_text().lower()).split() if len(_) > 2]
