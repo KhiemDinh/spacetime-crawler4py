@@ -24,8 +24,6 @@ def extract_next_links(url, resp):
     # Implementation required.
     try:
         url = urldefrag(url)[0]
-        if url in url_set:
-            return []
 
         output = set()
         soup = BeautifulSoup(requests.get(url).text, 'html.parser')
@@ -46,7 +44,12 @@ def extract_next_links(url, resp):
 
         for link in soup.find_all('a', href=True):
             link = link.attrs.get('href')
-            if link: output.add(urldefrag(link)[0])
+
+            if link: 
+                link = urldefrag(link)[0]
+
+                if link not in url_set:
+                    output.add(link)
             
         # debugging
         # print(soup_text)
