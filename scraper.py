@@ -72,16 +72,17 @@ def crawlable(url, parsed):
 
 
 def is_trap(parsed):
+    print(parsed.geturl())
     # long urls
     if len(parsed.geturl()) >= 200:
         return True
 
     # calendars
-    if re.match(r".*(calendar).?$", parsed.path.lower()):
+    if re.match(r".*(calendar).?$", parsed.geturl()):
         return True
 
     # disallowed websites
-    if re.match(r".*(wics.ics.uci.edu/events|evoke.ics.uci.edu).?$", parsed.path.lower()):
+    if re.match(r".*(wics.ics.uci.edu/events|evoke.ics.uci.edu).?$", parsed.geturl()):
         return True
     
     # very large files ??
@@ -146,6 +147,8 @@ def record_information(url):
     for word in soup_text:
         frequency[word] += 1
 
+    frequency = sorted(frequency.items(), key=lambda item: (-item[1], item[0]))
+
     with open('textlist.txt', 'w') as f:
-        for k, v in sorted(frequency.items(), key=lambda item: (-item[1], item[0])):
-            f.writelines("{} -> {}".format(k, v))
+        for k, v in frequency:
+            f.writelines("{} -> {}\n".format(k, v))
