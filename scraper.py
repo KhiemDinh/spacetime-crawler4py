@@ -36,7 +36,7 @@ def extract_next_links(url, resp):
     
     # define high quality soup to be 200+ unique words
     # account for if the response status is 200 but has no text
-    if len(set(soup_text)) <= 200 or (resp.status == 200 and len(soup_text) == 0):
+    if len(set(soup_text)) <= 200 or (resp.status == 200 and not soup_text):
         return []
     ########## SimHash Implementation HERE ##########
 
