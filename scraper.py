@@ -43,7 +43,8 @@ def extract_next_links(url, resp):
     #################################################
 
     for link in soup.find_all('a', href=True):
-        output.add(urldefrag(link.attrs.get('href'))[0])
+        link = link.attrs.get('href')
+        if link: output.add(urldefrag(link)[0])
         
     # debugging
     # print(soup_text)
