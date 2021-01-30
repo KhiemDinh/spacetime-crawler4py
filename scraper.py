@@ -68,7 +68,7 @@ def crawlable(url, parsed):
         netloc = parsed.scheme + "://" + parsed.netloc + "/robots.txt"
         site = requests.get(netloc)
 
-        if 200 <= site.status_code <= 599 and site.status_code != 204:
+        if 200 == site.status_code:
             permission = urllib.robotparser.RobotFileParser()
             permission.set_url(netloc)
             permission.read()
