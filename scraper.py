@@ -36,8 +36,9 @@ def extract_next_links(url, resp):
     
     # define high quality soup to be 200+ unique words
     # account for if the response status is 200 but has no text
-    if len(set(soup_text)) <= 200 or (resp.status == 200 and not soup_text):
+    if len(set(soup_text)) <= 200:
         return []
+
     ########## SimHash Implementation HERE ##########
 
     #################################################
@@ -58,6 +59,9 @@ def crawlable(url, parsed):
     try:
         netloc = parsed.scheme + "://" + parsed.netloc + "/robots.txt"
         site = requests.get(netloc)
+
+        if site.status_code != 200:
+            return False
         
         permission = urllib.robotparser.RobotFileParser()
         permission.set_url(netloc)
