@@ -15,6 +15,7 @@ class Worker(Thread):
         
     def run(self):
         tmp = open("textlist.txt", 'a')
+
         while True:
             tbd_url = self.frontier.get_tbd_url()
             if not tbd_url:
@@ -30,4 +31,5 @@ class Worker(Thread):
                 self.frontier.add_url(scraped_url)
             self.frontier.mark_url_complete(tbd_url)
             time.sleep(self.config.time_delay)
+            
         tmp.close()
