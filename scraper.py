@@ -30,7 +30,15 @@ def extract_next_links(url, resp):
     output = set()
     soup = BeautifulSoup(requests.get(url).text, 'html.parser')
 
-    if resp.status == 200 and len(soup.get_text()) == 0:
+    soup_text = re.sub('[^A-Za-z0-9]+', ' ', soup.get_text().lower()).split()
+    
+    # check if soup is high quality
+    # find all unique words in the soup that are of length 3+
+    soup_text = [_ for _ in soup_text if len(_) > 2]
+    
+    # define high quality soup to be 200+ unique words
+    # account for if the response status is 200 but has no text
+    if len(set(soup_text)) <= 200 or (resp.status == 200 and len(soup_text) == 0):
         return []
     ########## SimHash Implementation HERE ##########
 
@@ -81,23 +89,6 @@ def is_trap(parsed):
     # can't do much with the parsed urls only; need the actual content
 
 
-def check_quality(url):
-    is_quality = True
-    soup = BeautifulSoup(requests.get(url).text, 'html.parser')
-    soup_text = re.sub('[^A-Za-z0-9]+', ' ', soup.get_text().lower()).split()
-    
-    # check if soup is high quality
-    # find all unique words in the soup that are of length 3+
-    soup_text = [_ for _ in soup_text if len(_) > 2]
-    
-    # define high quality soup to be 200+ unique words
-    # account for if the response status is 200 but has no text
-    if len(set(soup_text)) <= 200:
-        is_quality = False
-
-    return (is_quality, soup_text)
-
-
 def is_valid(url):
     try:
         parsed = urlparse(url)
@@ -123,11 +114,6 @@ def is_valid(url):
         if url in url_set:
             return False
 
-        is_quality, soup_text = check_quality(url)
-
-        if not is_quality:
-            return False
-
         if re.match(
             r".*\.(css|js|bmp|gif|jpe?g|ico"
             + r"|png|tiff?|mid|mp2|mp3|mp4"
@@ -140,7 +126,7 @@ def is_valid(url):
             + r"|rm|smil|wmv|swf|wma|zip|rar|gz|war|apk)$", parsed.path.lower()):
             return False
         
-        record_information(url, soup_text)
+        record_information(url)
         
         return True
 
@@ -151,9 +137,13 @@ def is_valid(url):
 # record information here because we know that the url is a valid url to be downloaded from.
 # unfortunately takes a lot of time so a better implementation on how to record the information
 # would be very much appreciated
-def record_information(url, soup_text):
+def record_information(url):
     global url_set, frequency    
 
+    soup = BeautifulSoup(requests.get(url).text, 'html.parser')
+    soup_text = re.sub('[^A-Za-z0-9]+', ' ', soup.get_text().lower()).split()
+    soup_text = [_ for _ in soup_text if len(_) > 2]
+    
     url_set.add(url)
     print("CURRENT URL_COUNT: {}".format(len(url_set)))
 
