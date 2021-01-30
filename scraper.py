@@ -141,8 +141,7 @@ def record_information(url):
     global url_set, frequency    
 
     soup = BeautifulSoup(requests.get(url).text, 'html.parser')
-    soup_text = re.sub('[^A-Za-z0-9]+', ' ', soup.get_text().lower()).split()
-    soup_text = [_ for _ in soup_text if len(_) > 2]
+    soup_text = [_ for _ in re.sub('[^A-Za-z0-9]+', ' ', soup.get_text().lower()).split() if len(_) > 2]
     
     url_set.add(url)
     print("CURRENT URL_COUNT: {}".format(len(url_set)))
