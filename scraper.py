@@ -26,7 +26,7 @@ def extract_next_links(url, resp):
         url = urldefrag(url)[0]
         output = set()
 
-        if 200 == url.status_code:
+        if 200 == resp.status:
             soup = BeautifulSoup(requests.get(url).text, 'html.parser')
 
             # check if soup is high quality
