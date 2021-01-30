@@ -1,7 +1,8 @@
 import re
 import requests
 import urllib.robotparser
-from urllib.parse import urlparse
+from collections import defaultdict
+from urllib.parse import urlparse, urldefrag
 from bs4 import BeautifulSoup
 
 # testing purposes
@@ -32,13 +33,19 @@ def extract_next_links(url, resp):
     
     # check if soup is high quality
     # find all unique words in the soup that are of length 3+
-    soup_text = set([_ for _ in re.sub('[^A-Za-z0-9]+', ' ', soup.get_text().lower()).split() if len(_) > 2])
-    # define high quality soup to be 200+  unique words
-    if len(soup_text) <= 200:
+    soup_text = [_ for _ in re.sub('[^A-Za-z0-9]+', ' ', soup.get_text().lower()).split() if len(_) > 2]
+    
+    # define high quality soup to be 200+ unique words
+    # account for if the response status is 200 but has no text
+    if len(set(soup_text)) <= 200 or (resp.status == 200 and set(soup_text) == set()):
         return []
 
+    ########## SimHash Implementation HERE ##########
+
+    #################################################
+
     for link in soup.find_all('a', href=True):
-        output.add(link.attrs.get('href'))
+        output.add(urldefrag(link.get('href'))[0])
         
     # debugging
     # print(soup_text)
@@ -49,7 +56,8 @@ def extract_next_links(url, resp):
         f.writelines("%s\n" % word for word in soup_text)
         
     ### as well as our global dictionoary for later convinence
-    
+    global frequency    
+
     for word in soup_text:
         if word not in frequency: frequency[word] = 1
         else: frequency[word] += 1
@@ -65,9 +73,6 @@ def crawlable(url, parsed):
     try:
         netloc = "https://" + parsed.netloc + "/robots.txt"
         site = requests.get(netloc)
-        
-        if site.status_code != 200:
-            return False
         
         permission = urllib.robotparser.RobotFileParser()
         permission.set_url(netloc)
@@ -86,7 +91,11 @@ def is_trap(parsed):
         return True
 
     # calendars
-    if re.match(r".*(/calendar).?$", parsed.path.lower()):
+    if re.match(r".*(calendar).?$", parsed.path.lower()):
+        return True
+
+    # disallowed websites
+    if re.match(r".*(wics.ics.uci.edu/events|evoke.ics.uci.edu).?$", parsed.path.lower()):
         return True
     
     # very large files ??
@@ -103,13 +112,7 @@ def is_valid(url):
         global url_count, url_set
 
         # check domain
-        
-        # not forget to add other urls
-        # "ics.uci.edu/"
-        # "cs.uci.edu/"
-        # "stat.uci.edu/"
-        # "today.uci.edu/department/information_computer_sciences/"
-        if url.find("ics.uci.edu/") and url.find("cs.uci.edu/") \
+        if url.find("ics.uci.edu/") == -1 and url.find("cs.uci.edu/") == -1 \
             and url.find("informatics.uci.edu/") == -1 and url.find("stat.uci.edu/") == -1 \
             and url.find("today.uci.edu/department/information_computer_sciences/") == -1:
             return False
@@ -125,7 +128,6 @@ def is_valid(url):
         # check duplicates
         if url in url_set:
             return False
-
 
         if re.match(
             r".*\.(css|js|bmp|gif|jpe?g|ico"
