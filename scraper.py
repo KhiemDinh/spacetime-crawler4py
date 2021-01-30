@@ -34,9 +34,8 @@ def extract_next_links(url, resp):
             soup_text = re.sub('[^A-Za-z0-9]+', ' ', soup.get_text().lower())
             soup_list = [_ for _ in soup_text.split() if len(_) > 2]
 
-            # define high quality soup to be 200+ unique words
-            # account for if the response status is 200 but has no text
-            if len(set(soup_list)) <= 200:
+            # define high quality soup to be 200+ words
+            if len(soup_list) <= 200:
                 return []
 
             ########## SimHash Implementation HERE ##########
