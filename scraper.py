@@ -3,7 +3,7 @@ import urllib.robotparser
 from collections import defaultdict
 from urllib.parse import urlparse, urldefrag
 from bs4 import BeautifulSoup
-from simhash import Simhash
+from simhash import Simhash, SimhashIndex
 
 # solutions to question 1
 url_set = set()
@@ -21,6 +21,10 @@ longest = ['url', 0]
 ### to answer questions, will have a separate file
 ### utilities.py
 
+### SimhashIndex
+num = 0
+index = SimhashIndex([], k = 3)
+
 traps = ["/calendar","replytocom=","wp-json","share=","format=xml", "/feed", ".pdf", ".zip", ".sql", "action=login", "?ical=", ".ppt", "version=", "=diff", "difftype=sidebyside"]
 disallowed = ["wics.ics.uci.edu/events", "evoke.ics.uci.edu/qs-personal-data-landscapes-poster"]
 
@@ -34,6 +38,7 @@ def scraper(url, resp):
 def extract_next_links(url, resp):
     # Implementation required.
     try:
+        global num
         output = set()
 
         if 200 == resp.status:
@@ -51,7 +56,10 @@ def extract_next_links(url, resp):
                 return []
 
             ########## SimHash Implementation HERE ##########
-        
+            num += 1
+            s1 = Simhash(get_features(soup.get_text()))
+            if index.get_near_dups(s1) == []: index.add(str(num), s1)
+            else: print("duplitcate!")
             #################################################
             
             # longest content?
@@ -163,3 +171,10 @@ def is_valid(url):
         print ("TypeError for ", parsed)
         raise
 
+### a helper function for simhash
+
+def get_features(s):
+    width = 3
+    s = s.lower()
+    s = re.sub(r'[^\w]+', '', s)
+    return [s[i:i + width] for i in range(max(len(s) - width + 1, 1))]
