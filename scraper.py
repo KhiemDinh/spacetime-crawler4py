@@ -15,7 +15,7 @@ disallowed = ["wics.ics.uci.edu/events", "evoke.ics.uci.edu/qs-personal-data-lan
 ### But we have a backup as a file as well
 frequency = defaultdict(int)
 
-ALPHANUM_PATTERN = re.compile(r"[A-Za-Z0-9]+")
+ALPHANUM_PATTERN = re.compile(r"[A-Za-z0-9]+")
 
 def scraper(url, resp):
     links = extract_next_links(url, resp)
