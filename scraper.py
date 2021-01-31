@@ -4,6 +4,7 @@ import urllib.robotparser
 from collections import defaultdict
 from urllib.parse import urlparse, urldefrag
 from bs4 import BeautifulSoup
+from simhash import Simhash
 
 # testing purposes + solutions to question 1
 url_set = set()
@@ -48,11 +49,6 @@ def extract_next_links(url, resp):
             # find all unique words in the soup that are of length 3+
             soup_list = [i for i in ALPHANUM_PATTERN.findall(soup.get_text()) if len(i) > 2]
             
-            # longest content?
-            if len(soup_list) > longest[1]:
-                longest[0] = url
-                longest[1] = len(soup_list)
-            
             # soup_text = re.sub('[^A-Za-z0-9]+', ' ', soup.get_text().lower())
             # soup_list = [_ for _ in soup_text.split() if len(_) > 2]
 
@@ -62,6 +58,13 @@ def extract_next_links(url, resp):
 
             # lower case here because we save a bit of processing power after len(soup_list)
             soup_list = soup_list.lower()
+            
+            # longest content?
+            if len(soup_list) > longest[1]:
+                longest[0] = url
+                longest[1] = len(soup_list)
+                with open('longest.txt', 'w') as f:
+                    f.writelines("{} : {}".format(longest[0], longest[1]))
             
             # writes to the textlist.txt file
             
