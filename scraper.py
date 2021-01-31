@@ -41,17 +41,18 @@ def extract_next_links(url, resp):
 
             # check if soup is high quality
             # find all unique words in the soup that are of length 3+
-            soup_list = [i for i in ALPHANUM_PATTERN.findall(soup.get_text()) if len(i) > 2]
+            soup_list = [i for i in ALPHANUM_PATTERN.findall(soup.get_text().lower()) if len(i) > 2]
             
             # soup_text = re.sub('[^A-Za-z0-9]+', ' ', soup.get_text().lower())
             # soup_list = [_ for _ in soup_text.split() if len(_) > 2]
 
-            # define high quality soup to be 200+ words
-            if len(soup_list) <= 200:
+            # define high quality soup to be 100+ words
+            if len(soup_list) <= 100:
                 return []
 
-            # lower case here because we save a bit of processing power after len(soup_list)
-            soup_list = soup_list.lower()
+            ########## SimHash Implementation HERE ##########
+        
+            #################################################
             
             # longest content?
             if len(soup_list) > longest[1]:
@@ -71,10 +72,6 @@ def extract_next_links(url, resp):
             with open('urllist.txt', 'a') as f: # keeps appending
                 f.writelines("%s\n" % url)
 
-            ########## SimHash Implementation HERE ##########
-        
-            #################################################
-
             for link in soup.find_all('a', href=True):
                 link = link.attrs.get('href')
 
@@ -85,7 +82,7 @@ def extract_next_links(url, resp):
                         output.add(link)
             
         return list(output)
-    
+
     except:
         return []
 
@@ -100,7 +97,7 @@ def crawlable(url, parsed):
         permission.read()
 
         return permission.can_fetch("*", url)
-    
+        
     # no robots.txt
     except:
         return False
@@ -135,7 +132,7 @@ def is_valid(url):
         # check domain
         if url.find(".ics.uci.edu/") == -1 and url.find(".cs.uci.edu/") == -1 \
             and url.find(".informatics.uci.edu/") == -1 and url.find(".stat.uci.edu/") == -1 \
-            and url.find(".today.uci.edu/department/information_computer_sciences/") == -1:
+            and url.find("today.uci.edu/department/information_computer_sciences/") == -1:
             return False
 
         # check robots.txt
