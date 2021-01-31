@@ -11,8 +11,12 @@ def main(config_file, restart):
     ### the program crashes and the list of words get gone
     ### opening and closing textlist.txt if it already exists
     ### this will overwrite and erase the previous content
-    tmp = open('textlist.txt', 'w')
-    tmp.close()
+    
+    ### will fresh start only if --restart parameter given
+    if restart:
+        tmp = open('textlist.txt', 'w')
+        tmp.close()
+        
     
     cparser = ConfigParser()
     cparser.read(config_file)
