@@ -1,11 +1,10 @@
 import re
-import requests
 import urllib.robotparser
 from collections import defaultdict
 from urllib.parse import urlparse, urldefrag
 from bs4 import BeautifulSoup
 
-# testing purposes + solutions to question 1
+# solutions to question 1
 url_set = set()
 
 ### for answering question 2
@@ -24,10 +23,6 @@ longest = ['url', 0]
 traps = ["/calendar","replytocom=","wp-json","share=","format=xml", "/feed", ".pdf", ".zip", ".sql", "action=login", "?ical=", ".ppt", "version=", "=diff", "difftype=sidebyside"]
 disallowed = ["wics.ics.uci.edu/events", "evoke.ics.uci.edu/qs-personal-data-landscapes-poster"]
 
-### And we'll have a global dictionary as well
-### But we have a backup as a file as well
-frequency = defaultdict(int)
-
 ALPHANUM_PATTERN = re.compile(r"[A-Za-z0-9]+")
 
 def scraper(url, resp):
@@ -38,11 +33,10 @@ def scraper(url, resp):
 def extract_next_links(url, resp):
     # Implementation required.
     try:
-        url = urldefrag(url)[0]
         output = set()
 
         if 200 == resp.status:
-            soup = BeautifulSoup(requests.get(url).text, 'html.parser')
+            soup = BeautifulSoup(resp.raw_response.content, 'html.parser')
 
             # check if soup is high quality
             # find all unique words in the soup that are of length 3+
@@ -86,10 +80,6 @@ def extract_next_links(url, resp):
 
                     if link not in url_set:
                         output.add(link)
-                
-            # debugging
-            # print(soup_text)
-            # print(frequency)
             
         return list(output)
     
@@ -101,7 +91,6 @@ def crawlable(url, parsed):
     # check robots.txt
     try:
         netloc = parsed.scheme + "://" + parsed.netloc + "/robots.txt"
-        site = requests.get(netloc)
 
         permission = urllib.robotparser.RobotFileParser()
         permission.set_url(netloc)
@@ -131,9 +120,6 @@ def is_trap(parsed):
             return True
 
     return False
-    
-    # very large files ??
-    # can't do much with the parsed urls only; need the actual content
 
 
 def is_valid(url):
@@ -169,7 +155,7 @@ def is_valid(url):
             + r"|rm|smil|wmv|swf|wma|zip|rar|gz|war|apk)$", parsed.path.lower()):
             return False
         
-        record_information(url)
+        url_set.add(url)
         
         return True
 
@@ -177,23 +163,3 @@ def is_valid(url):
         print ("TypeError for ", parsed)
         raise
 
-# record information here because we know that the url is a valid url to be downloaded from.
-# unfortunately takes a lot of time so a better implementation on how to record the information
-# would be very much appreciated
-def record_information(url):
-    global url_set, frequency    
-
-    # soup = BeautifulSoup(requests.get(url).text, 'html.parser')
-    # soup_text = [_ for _ in re.sub('[^A-Za-z0-9]+', ' ', soup.get_text().lower()).split() if len(_) > 2]
-    
-    url_set.add(url)
-    # print("CURRENT URL_COUNT: {}".format(len(url_set)))
-
-    # for word in soup_text:
-    #     frequency[word] += 1
-
-    ### we probably don't need the following... ###
-
-    # with open('textlist.txt', 'w') as f:
-    #     for k, v in sorted(frequency.items(), key=lambda item: (-item[1], item[0])):
-    #         f.writelines("{} -> {}\n".format(k, v))
