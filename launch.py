@@ -13,9 +13,12 @@ def main(config_file, restart):
     ### this will overwrite and erase the previous content
     
     ### will fresh start only if --restart parameter given
+    ### also adding the list of url's
     if restart:
         tmp = open('textlist.txt', 'w')
         tmp.close()
+        tmp2 = open('urllist.txt', 'w')
+        tmp2.close()
         
     
     cparser = ConfigParser()

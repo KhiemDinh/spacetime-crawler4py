@@ -13,10 +13,13 @@ url_set = set()
 longest = ['url', 0]
 
 ### question 3
-### make sure to uncomment the bottom code in
-### function record_information
+### saving textlist.txt done inside extract_next_links
 
 ### question 4
+### also saving urllist.txt done inside extract_next_links
+
+### to answer questions, will have a separate file
+### utilities.py
 
 traps = ["/calendar","replytocom=","wp-json","share=","format=xml", "/feed", ".pdf", ".zip", ".sql", "action=login", "?ical=", ".ppt", "version=", "=diff", "difftype=sidebyside"]
 disallowed = ["wics.ics.uci.edu/events", "evoke.ics.uci.edu/qs-personal-data-landscapes-poster"]
@@ -59,6 +62,17 @@ def extract_next_links(url, resp):
 
             # lower case here because we save a bit of processing power after len(soup_list)
             soup_list = soup_list.lower()
+            
+            # writes to the textlist.txt file
+            
+            with open('textlist.txt', 'a') as f: # keeps appending
+                f.writelines("%s\n" % word for word in soup_list)
+                
+            
+            # adds url to the urllist.txt file
+            
+            with open('urllist.txt', 'a') as f: # keeps appending
+                f.writelines("%s\n" % url)
 
             ########## SimHash Implementation HERE ##########
         
@@ -177,8 +191,8 @@ def record_information(url):
 
     # for word in soup_text:
     #     frequency[word] += 1
-    
-    ### to answer question 3 we need the following code ###
+
+    ### we probably don't need the following... ###
 
     # with open('textlist.txt', 'w') as f:
     #     for k, v in sorted(frequency.items(), key=lambda item: (-item[1], item[0])):
