@@ -26,7 +26,7 @@ num = 0
 index = SimhashIndex([], k = 3)
 
 traps = ["/calendar","replytocom=","wp-json","share=","format=xml", "/feed", ".pdf", ".zip", ".sql", "action=login", "?ical=", ".ppt", "version=", "=diff", "difftype=sidebyside"]
-disallowed = ["wics.ics.uci.edu/events", "evoke.ics.uci.edu/qs-personal-data-landscapes-poster"]
+disallowed = ["wics.ics.uci.edu/events", "evoke.ics.uci.edu/qs-personal-data-landscapes-poster", "informatics.uci.edu/files/pdf/InformaticsBrochure-March2018"]
 
 ALPHANUM_PATTERN = re.compile(r"[A-Za-z0-9]+")
 
@@ -51,9 +51,8 @@ def extract_next_links(url, resp):
             # soup_text = re.sub('[^A-Za-z0-9]+', ' ', soup.get_text().lower())
             # soup_list = [_ for _ in soup_text.split() if len(_) > 2]
 
-            # define high quality soup to be 100+ words
-            if len(soup_list) <= 100:
-                return []
+            # check if the soup is empty
+            if len(soup_list) <= 0: return []
 
             ########## SimHash Implementation HERE ##########
             num += 1

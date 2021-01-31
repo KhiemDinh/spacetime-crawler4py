@@ -4909,3 +4909,8 @@ https://www.ics.uci.edu/faculty/profiles/view_faculty.php?ucinetid=sjarecki
 https://www.ics.uci.edu/faculty/profiles/view_faculty.php?ucinetid=sudderth
 https://www.ics.uci.edu/faculty/profiles/view_faculty.php?ucinetid=aburtsev
 https://www.cs.uci.edu/research-centers
+http://www.stat.uci.edu/seminar-series/seminar-series-2018-2019
+http://www.stat.uci.edu/wp-content/uploads/LorinCrawfordAbstract5-2-19
+http://www.stat.uci.edu/wp-content/uploads/TianZhengAbstract5-30-19
+http://www.stat.uci.edu/wp-content/uploads/StephanMandtAbstract5-16-19
+http://www.stat.uci.edu/wp-content/uploads/XinTongAbstract4-25-19
