@@ -15,6 +15,8 @@ disallowed = ["wics.ics.uci.edu/events", "evoke.ics.uci.edu/qs-personal-data-lan
 ### But we have a backup as a file as well
 frequency = defaultdict(int)
 
+ALPHANUM_PATTERN = re.compile(r"[A-Za-Z0-9]+")
+
 def scraper(url, resp):
     links = extract_next_links(url, resp)
     return [link for link in links if is_valid(link)]
@@ -31,12 +33,17 @@ def extract_next_links(url, resp):
 
             # check if soup is high quality
             # find all unique words in the soup that are of length 3+
-            soup_text = re.sub('[^A-Za-z0-9]+', ' ', soup.get_text().lower())
-            soup_list = [_ for _ in soup_text.split() if len(_) > 2]
+            soup_list = [i for i in ALPHANUM_PATTERN.findall(soup.get_text()) if len(i) > 2]
+
+            # soup_text = re.sub('[^A-Za-z0-9]+', ' ', soup.get_text().lower())
+            # soup_list = [_ for _ in soup_text.split() if len(_) > 2]
 
             # define high quality soup to be 200+ words
             if len(soup_list) <= 200:
                 return []
+
+            # lower case here because we save a bit of processing power after len(soup_list)
+            soup_list = soup_list.lower()
 
             ########## SimHash Implementation HERE ##########
         
