@@ -8,6 +8,19 @@ from bs4 import BeautifulSoup
 # testing purposes + solutions to question 1
 url_set = set()
 
+### for answering question 2
+### [longest url, number of words] 
+longest = ['url', 0]
+
+### question 3
+### saving textlist.txt done inside extract_next_links
+
+### question 4
+### also saving urllist.txt done inside extract_next_links
+
+### to answer questions, will have a separate file
+### utilities.py
+
 traps = ["/calendar","replytocom=","wp-json","share=","format=xml", "/feed", ".pdf", ".zip", ".sql", "action=login", "?ical=", ".ppt", "version=", "=diff", "difftype=sidebyside"]
 disallowed = ["wics.ics.uci.edu/events", "evoke.ics.uci.edu/qs-personal-data-landscapes-poster"]
 
@@ -34,7 +47,12 @@ def extract_next_links(url, resp):
             # check if soup is high quality
             # find all unique words in the soup that are of length 3+
             soup_list = [i for i in ALPHANUM_PATTERN.findall(soup.get_text()) if len(i) > 2]
-
+            
+            # longest content?
+            if len(soup_list) > longest[1]:
+                longest[0] = url
+                longest[1] = len(soup_list)
+            
             # soup_text = re.sub('[^A-Za-z0-9]+', ' ', soup.get_text().lower())
             # soup_list = [_ for _ in soup_text.split() if len(_) > 2]
 
@@ -44,6 +62,17 @@ def extract_next_links(url, resp):
 
             # lower case here because we save a bit of processing power after len(soup_list)
             soup_list = soup_list.lower()
+            
+            # writes to the textlist.txt file
+            
+            with open('textlist.txt', 'a') as f: # keeps appending
+                f.writelines("%s\n" % word for word in soup_list)
+                
+            
+            # adds url to the urllist.txt file
+            
+            with open('urllist.txt', 'a') as f: # keeps appending
+                f.writelines("%s\n" % url)
 
             ########## SimHash Implementation HERE ##########
         
@@ -162,6 +191,8 @@ def record_information(url):
 
     # for word in soup_text:
     #     frequency[word] += 1
+
+    ### we probably don't need the following... ###
 
     # with open('textlist.txt', 'w') as f:
     #     for k, v in sorted(frequency.items(), key=lambda item: (-item[1], item[0])):
