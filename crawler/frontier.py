@@ -17,7 +17,7 @@ class Frontier(object):
         self.config = config
         self.to_be_downloaded = list()
         self.lock = RLock()
-        self.last_url = ''
+        self.url_dict = {}
         
         if not os.path.exists(self.config.save_file) and not restart:
             # Save file does not exist, but request to load save.
@@ -58,13 +58,23 @@ class Frontier(object):
             with self.lock:
                 last_url = self.to_be_downloaded.pop()
                 # check if the domain is the same, if it is, then sleep
-                if urlparse(last_url).netloc == urlparse(self.last_url).netloc:
+                parsed_url = urlparse(last_url).netloc
+                current_time = datetime.datetime.now()
+                if parsed_url not in self.url_dict:
+                    self.url_dict[parsed_url] = current_time
+                elif current_time - self.url_dict[parsed_url] < datetime.timedelta(seconds=self.config.time_delay + 0.1):       # 0.1 ms overhead just in case
                     # SLEEP
-                    time.sleep(self.config.time_delay)      # respect the politeness rule
-                self.last_url = last_url
+                    time_to_sleep = datetime.timedelta(seconds=self.config.time_delay) - (current_time - self.url_dict[parsed_url])
+
+                    print("Need to sleep", time_to_sleep.microseconds / 1000000,
+                     "=", datetime.timedelta(seconds=self.config.time_delay).microseconds / 1000000,
+                     '-', (current_time - self.url_dict[parsed_url]).microseconds / 1000000)
+                    
+                    time.sleep(time_to_sleep.microseconds / 1000000)      # respect the politeness rule
+                self.url_dict[parsed_url] = datetime.datetime.now()
                 # PRINT
-                print(datetime.datetime.now(), urlparse(last_url).netloc)
-                return self.last_url
+                print(self.url_dict[parsed_url], urlparse(last_url).netloc)
+                return last_url
         except IndexError:
             return None
 
