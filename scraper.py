@@ -47,7 +47,7 @@ def extract_next_links(url, resp):
             # check if soup is high quality
             # find all unique words in the soup that are of length 3+
             soup_text =  soup.get_text()
-            soup_list = [i for i in ALPHANUM_PATTERN.findall(soup.get_text().lower()) if len(i) > 2]
+            soup_list = [i for i in ALPHANUM_PATTERN.findall(soup_text.lower()) if len(i) > 2]
             
             # soup_text = re.sub('[^A-Za-z0-9]+', ' ', soup.get_text().lower())
             # soup_list = [_ for _ in soup_text.split() if len(_) > 2]
@@ -58,7 +58,9 @@ def extract_next_links(url, resp):
             ########## SimHash Implementation HERE ##########
             num += 1
             s1 = Simhash(get_features(soup_text))
-            if index.get_near_dups(s1): print("duplicate!")
+            if index.get_near_dups(s1): 
+                print("duplicate!")
+                return []
             else: index.add(str(num), s1)
             #################################################
             
