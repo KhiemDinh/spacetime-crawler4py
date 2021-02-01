@@ -3,7 +3,7 @@ import urllib.robotparser
 from collections import defaultdict
 from urllib.parse import urlparse, urldefrag
 from bs4 import BeautifulSoup
-from simhash import Simhash, SimhashIndex
+from simhash import Simhash, SimhashIndex   # simhash implementation using https://leons.im/posts/a-python-implementation-of-simhash-algorithm/
 
 # solutions to question 1
 url_set = set()
@@ -172,7 +172,6 @@ def is_valid(url):
         raise
 
 ### a helper function for simhash
-
 def get_features(s):
     width = 3
     s = s.lower()
