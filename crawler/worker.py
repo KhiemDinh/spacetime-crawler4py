@@ -5,6 +5,7 @@ from utils import get_logger
 from scraper import scraper
 import time
 
+# Solutions to question 1
 DOWNLOAD_SET = set()
 
 class Worker(Thread):
@@ -18,7 +19,7 @@ class Worker(Thread):
         while True:
             tbd_url = self.frontier.get_tbd_url()
             if not tbd_url:
-                self.logger.info("Frontier is empty. Stopping Crawler.")
+                self.logger.info(f"Frontier for this worker is empty. Stopping Worker {self.worker_id}.")
                 break
 
             if tbd_url in DOWNLOAD_SET:
@@ -32,4 +33,4 @@ class Worker(Thread):
             for scraped_url in scraped_urls:
                 self.frontier.add_url(scraped_url)
             self.frontier.mark_url_complete(tbd_url)
-            time.sleep(self.config.time_delay)
+            # time.sleep(self.config.time_delay) MORE WORK

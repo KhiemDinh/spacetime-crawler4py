@@ -1,6 +1,10 @@
 import os
 import shelve
+import time
 
+import datetime
+
+from urllib.parse import urlparse
 from threading import Thread, RLock
 from queue import Queue, Empty
 
@@ -13,6 +17,7 @@ class Frontier(object):
         self.config = config
         self.to_be_downloaded = list()
         self.lock = RLock()
+        self.last_url = ''
         
         if not os.path.exists(self.config.save_file) and not restart:
             # Save file does not exist, but request to load save.
@@ -50,7 +55,16 @@ class Frontier(object):
 
     def get_tbd_url(self):
         try:
-            return self.to_be_downloaded.pop()
+            with self.lock:
+                last_url = self.to_be_downloaded.pop()
+                # check if the domain is the same, if it is, then sleep
+                if urlparse(last_url).netloc == urlparse(self.last_url).netloc:
+                    # SLEEP
+                    time.sleep(self.config.time_delay)      # respect the politeness rule
+                self.last_url = last_url
+                # PRINT
+                print(datetime.datetime.now(), urlparse(last_url).netloc)
+                return self.last_url
         except IndexError:
             return None
 

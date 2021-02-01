@@ -5,8 +5,8 @@ from urllib.parse import urlparse, urldefrag
 from bs4 import BeautifulSoup
 from simhash import Simhash, SimhashIndex   # simhash implementation using https://leons.im/posts/a-python-implementation-of-simhash-algorithm/
 
-# solutions to question 1
-url_set = set()
+# solutions to question 1 moved to DOWNLOAD_SET
+# url_set = set()
 
 ### for answering question 2
 ### [longest url, number of words] 
@@ -86,8 +86,8 @@ def extract_next_links(url, resp):
                 if link: 
                     link = urldefrag(link)[0]
 
-                    if link not in url_set:
-                        output.add(link)
+                    # if link not in url_set:
+                    output.add(link)                # output add regardless because the workers will skip it if it was already ran.
             
         return list(output)
 
@@ -163,7 +163,7 @@ def is_valid(url):
             + r"|rm|smil|wmv|swf|wma|zip|rar|gz|war|apk)$", parsed.path.lower()):
             return False
         
-        url_set.add(url)
+        # url_set.add(url)
         
         return True
 
