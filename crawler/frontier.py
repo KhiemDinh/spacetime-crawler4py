@@ -66,10 +66,10 @@ class Frontier(object):
                     self.url_dict[parsed_url] = current_time
 
                 elif current_time - self.url_dict[parsed_url] < datetime.timedelta(seconds=self.config.time_delay + 0.1):       # 0.1 ms overhead just in case
-                    time_to_sleep = datetime.timedelta(seconds=self.config.time_delay) - (current_time - self.url_dict[parsed_url])
+                    time_to_sleep = datetime.timedelta(seconds=self.config.time_delay + 0.1) - (current_time - self.url_dict[parsed_url])
 
                     print("Need to sleep", time_to_sleep.microseconds / 1000000,
-                     "=", datetime.timedelta(seconds=self.config.time_delay).microseconds / 1000000,
+                     "=", datetime.timedelta(seconds=self.config.time_delay + 0.1).microseconds / 1000000,
                      '-', (current_time - self.url_dict[parsed_url]).microseconds / 1000000)
                     
                     time.sleep(time_to_sleep.microseconds / 1000000)      # respect the politeness rule
