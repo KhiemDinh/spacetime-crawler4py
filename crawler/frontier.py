@@ -57,13 +57,15 @@ class Frontier(object):
         try:
             with self.lock:
                 last_url = self.to_be_downloaded.pop()
+                
                 # check if the domain is the same, if it is, then sleep
                 parsed_url = urlparse(last_url).netloc
                 current_time = datetime.datetime.now()
+
                 if parsed_url not in self.url_dict:
                     self.url_dict[parsed_url] = current_time
+
                 elif current_time - self.url_dict[parsed_url] < datetime.timedelta(seconds=self.config.time_delay + 0.1):       # 0.1 ms overhead just in case
-                    # SLEEP
                     time_to_sleep = datetime.timedelta(seconds=self.config.time_delay) - (current_time - self.url_dict[parsed_url])
 
                     print("Need to sleep", time_to_sleep.microseconds / 1000000,
@@ -71,9 +73,11 @@ class Frontier(object):
                      '-', (current_time - self.url_dict[parsed_url]).microseconds / 1000000)
                     
                     time.sleep(time_to_sleep.microseconds / 1000000)      # respect the politeness rule
+
                 self.url_dict[parsed_url] = datetime.datetime.now()
-                # PRINT
+
                 print(self.url_dict[parsed_url], urlparse(last_url).netloc)
+
                 return last_url
         except IndexError:
             return None

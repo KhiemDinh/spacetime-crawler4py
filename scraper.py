@@ -63,7 +63,7 @@ def extract_next_links(url, resp):
             num += 1
             s1 = Simhash(get_features(soup_text))
             if index.get_near_dups(s1): 
-                print("duplicate!")
+                # print("duplicate!")
                 return []
             else: index.add(str(num), s1)
             #################################################
