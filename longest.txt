@@ -1,1 +1,1 @@
-http://www.ics.uci.edu/~kay/wordlist.txt : 384702
+https://wics.ics.uci.edu : 522
