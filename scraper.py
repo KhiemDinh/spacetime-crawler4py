@@ -41,6 +41,10 @@ def extract_next_links(url, resp):
         global num
         output = set()
 
+        # adds url to the urllist.txt file
+        with open('urllist.txt', 'a') as f: # keeps appending
+            f.writelines("%s\n" % url)
+
         if 200 == resp.status:
             soup = BeautifulSoup(resp.raw_response.content, 'html.parser')
 
@@ -54,10 +58,6 @@ def extract_next_links(url, resp):
 
             # check if the soup is empty
             if not soup_list: return []
-            
-            # adds url to the urllist.txt file
-            with open('urllist.txt', 'a') as f: # keeps appending
-                f.writelines("%s\n" % url)
 
             ########## SimHash Implementation HERE ##########
             num += 1
