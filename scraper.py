@@ -54,6 +54,10 @@ def extract_next_links(url, resp):
 
             # check if the soup is empty
             if not soup_list: return []
+            
+            # adds url to the urllist.txt file
+            with open('urllist.txt', 'a') as f: # keeps appending
+                f.writelines("%s\n" % url)
 
             ########## SimHash Implementation HERE ##########
             num += 1
@@ -63,7 +67,7 @@ def extract_next_links(url, resp):
                 return []
             else: index.add(str(num), s1)
             #################################################
-            
+
             # longest content?
             if len(soup_list) > longest[1]:
                 longest[0] = url
@@ -72,16 +76,10 @@ def extract_next_links(url, resp):
                     f.writelines("{} : {}".format(longest[0], longest[1]))
             
             # writes to the textlist.txt file
-            
             with open('textlist.txt', 'a') as f: # keeps appending
                 f.writelines("%s\n" % word for word in soup_list)
-                
-            
-            # adds url to the urllist.txt file
-            
-            with open('urllist.txt', 'a') as f: # keeps appending
-                f.writelines("%s\n" % url)
 
+            # find all links
             for link in soup.find_all('a', href=True):
                 link = link.attrs.get('href')
 
