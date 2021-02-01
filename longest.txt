@@ -1,1 +1,1 @@
-https://sli.ics.uci.edu/AIStats/Postings : 17347
+http://www.ics.uci.edu/~kay/wordlist.txt : 384702
