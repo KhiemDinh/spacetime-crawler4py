@@ -8,10 +8,11 @@ from utils import get_logger, get_urlhash, normalize
 from scraper import is_valid
 
 class Frontier(object):
+    to_be_downloaded = list()
     def __init__(self, config, restart):
         self.logger = get_logger("FRONTIER")
         self.config = config
-        self.to_be_downloaded = list()
+
         
         if not os.path.exists(self.config.save_file) and not restart:
             # Save file does not exist, but request to load save.
@@ -41,7 +42,7 @@ class Frontier(object):
         tbd_count = 0
         for url, completed in self.save.values():
             if not completed and is_valid(url):
-                self.to_be_downloaded.append(url)
+                Frontier.to_be_downloaded.append(url)
                 tbd_count += 1
         self.logger.info(
             f"Found {tbd_count} urls to be downloaded from {total_count} "
@@ -49,7 +50,7 @@ class Frontier(object):
 
     def get_tbd_url(self):
         try:
-            return self.to_be_downloaded.pop()
+            return Frontier.to_be_downloaded.pop()
         except IndexError:
             return None
 
@@ -59,7 +60,7 @@ class Frontier(object):
         if urlhash not in self.save:
             self.save[urlhash] = (url, False)
             self.save.sync()
-            self.to_be_downloaded.append(url)
+            Frontier.to_be_downloaded.append(url)
     
     def mark_url_complete(self, url):
         urlhash = get_urlhash(url)
