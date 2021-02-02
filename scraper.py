@@ -25,7 +25,7 @@ longest = ['url', 0]
 num = 0
 index = SimhashIndex([], k = 3)
 
-traps = ["/calendar","replytocom=","wp-json","share=","format=xml", "/feed", ".sql", "action=login", "?ical=", ".ppt", "version=", "=diff", "difftype=sidebyside"]
+traps = ["/calendar","replytocom=","wp-json","share=","format=xml", "/feed", ".sql", "?action=login", "?action=download&upname", "?ical=", ".ppt", "version=", "=diff", "difftype=sidebyside"]
 disallowed = ["wics.ics.uci.edu/events", "evoke.ics.uci.edu/qs-personal-data-landscapes-poster", "informatics.uci.edu/files/pdf/InformaticsBrochure-March2018"]
 
 ALPHANUM_PATTERN = re.compile(r"[A-Za-z0-9]+")
